@@ -141,7 +141,8 @@ impl Contract {
                     .replace("%SHOW_FORM%", &form_visibility)
                     .replace("%USER_ACCOUNT_ID%", &user_account_id)
                     .replace("%CATEGORIES_CHECKBOXES%", &categories_html)
-
+                    .replace("%FOOTER%", &include_str!("../res/footer.inc").to_string())
+                    .replace("%ICONS%", &include_str!("../res/icons.inc").to_string())
             );
         }
 
@@ -182,6 +183,8 @@ impl Contract {
                     .replace("%APP_PAGE_SLUG%", &app.slug)
                     .replace("%APP_PAGE_ADDED_BY%", &app.added_by_account_id.to_string())
                     .replace("%APP_PAGE_ID%", &app_id.to_string())
+                    .replace("%FOOTER%", &include_str!("../res/footer.inc").to_string())
+                    .replace("%ICONS%", &include_str!("../res/icons.inc").to_string())
 
             );
         }
@@ -219,6 +222,8 @@ impl Contract {
             include_str!("../res/catalog.html")
                 .replace("%APPLICATIONS%", &app_html)
                 .replace("%CATEGORIES%", &self.format_categories_menu(active_category_id))
+                .replace("%FOOTER%", &include_str!("../res/footer.inc").to_string())
+                .replace("%ICONS%", &include_str!("../res/icons.inc").to_string())
         )
     }
 }
@@ -305,7 +310,7 @@ fn format_icon(value: Option<String>, icon: &str, homepage: bool) -> String {
                 "twitter" => format!("https://twitter.com/{}", value),
                 "facebook" => format!("https://facebook.com/{}", value),
                 "medium" => format!("https://medium.com/{}", value),
-                "telegram" => format!("https://t.me/{}", value),
+                "telegram" => value,
                 "discord" => value,
                 "github" => format!("https://github.com/{}", value),
                 _ => "".to_string()
