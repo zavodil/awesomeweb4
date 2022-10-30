@@ -20,7 +20,7 @@ impl Contract {
         require!(app.title.len() <= 50, "ERR_TITLE_IS_TOO_LONG");
         require!(app.slug.len() <= 50, "ERR_SLUG_IS_TOO_LONG");
         require!(app.oneliner.clone().unwrap_or_default().len() <= 200, "ERR_ONELINER_IS_TOO_LONG");
-        require!(app.description.clone().unwrap_or_default().len() <= 5000, "ERR_TITLE_IS_TOO_LONG");
+        require!(app.description.clone().unwrap_or_default().len() <= 5000, "ERR_DESCRIPTION_IS_TOO_LONG");
 
         if !self.guardians.contains(&env::predecessor_account_id()) {
             require!(env::attached_deposit() >= LISTING_FEE, "ERR_LISTING_FEE_REQUIRED");
@@ -130,51 +130,6 @@ impl Contract {
                     )
             );
     }
-
-    /*
-    pub fn internal_add_app(&mut self, app: AppJSON, added_by_account_id: AccountId) {
-        self.app_id_by_slug.insert(&app.slug, &self.next_app_id);
-        self.app_id_by_dapp_account_id.insert(&app.dapp_account_id, &self.next_app_id);
-
-        let mut categories = UnorderedSet::new(StorageKey::AppCategories { app_id: self.next_app_id });
-        for category_string in app.categories {
-            let category_id: CategoryId = category_string.parse().expect("ERR_WRONG_CATEGORY");
-            if self.categories.get(&category_id).is_some() {
-                let mut apps_ids_by_category_id = self.apps_ids_by_category_id.get(&category_id).expect("ERR_NO_DATA");
-                apps_ids_by_category_id.insert(&self.next_app_id);
-                self.apps_ids_by_category_id.insert(&category_id, &apps_ids_by_category_id);
-                categories.insert(&category_id);
-            }
-        }
-        let mut contracts = UnorderedSet::new(StorageKey::AppContracts { app_id: self.next_app_id });
-        for contract in app.contracts {
-            contracts.insert(&contract);
-        }
-        let v_app = VApp::Current(App {
-            added_by_account_id,
-            dapp_account_id: app.dapp_account_id,
-            slug: app.slug.to_lowercase(),
-            title: app.title,
-            categories,
-            oneliner: app.oneliner,
-            description: app.description,
-            logo_url: app.logo_url,
-            twitter: app.twitter,
-            facebook: app.facebook,
-            medium: app.medium,
-            telegram: app.telegram,
-            github: app.github,
-            discord: app.discord,
-            symbol: app.symbol,
-            contracts: Some(contracts),
-            token_address: app.token_address,
-            active: Some(true),
-        });
-        self.apps.insert(&self.next_app_id, &v_app);
-
-        self.next_app_id += 1;
-    }
-     */
 
     pub fn internal_get_apps(&self, from_index: Option<u64>, limit: Option<u64>) -> Vec<(AppId, App)> {
         unordered_map_pagination(&self.apps, from_index, limit)
