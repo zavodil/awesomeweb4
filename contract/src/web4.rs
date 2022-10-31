@@ -65,6 +65,13 @@ impl Web4Response {
         }
     }
 
+    pub fn png_response(bytes: Vec<u8>) -> Self {
+        Self::Body {
+            content_type: String::from("image/png"),
+            body: bytes.to_owned().into()
+        }
+    }
+
     pub fn preload_urls(urls: Vec<String>) -> Self {
         Self::PreloadUrls {
             preload_urls: urls
@@ -96,16 +103,23 @@ impl Contract {
         }
 
         if path == "/style.css" {
-            return Web4Response::html_response(
-                include_str!("../res/style.css").to_string()
-            );
+            return Web4Response::html_response(include_str!("../res/style.css").to_string());
         }
 
-
         if path == "/no-image.svg" {
-            return Web4Response::svg_response(
-                include_str!("../res/no-image.svg").to_string()
-            );
+            return Web4Response::svg_response(include_str!("../res/no-image.svg").to_string());
+        }
+
+        if path == "/logo.svg" {
+            return Web4Response::svg_response(include_str!("../res/logo.svg").to_string());
+        }
+
+        if path == "/logo.png" {
+            return Web4Response::png_response(include_bytes!("../res/logo.png").to_vec());
+        }
+
+        if path == "/manifest.json" {
+            return Web4Response::plain_response(include_str!("../res/manifest.json").to_string());
         }
 
         if path == "/submit"  && !request.query.unwrap_or_default().contains_key("transactionHashes") {
@@ -154,9 +168,9 @@ impl Contract {
             let mut tags_html: String = "".to_string();
             for category_id in app.categories.to_vec() {
                 let category_data: Category = self.categories.get(&category_id).expect("ERR_WRONG_CATEGORY").into();
-                tags_html = format!("{}<a class=\"tag-item awesome-tag\" href=\"/category/{}\">{}</a>", tags_html, category_data.slug, category_data.title);
+                tags_html = format!(r#"{}<a class="tag-item awesome-tag" href="/category/{}">{}</a>"#, tags_html, category_data.slug, category_data.title);
             }
-            let category_html = format!("<div class=\"hero-tags\">{}</div>", &tags_html);
+            let category_html = format!(r#"<div class="hero-tags">{}</div>"#, &tags_html);
 
             let social_links = format!("{}{}{}{}{}{}",
                                        format_icon(app.twitter, "twitter", false),
@@ -173,6 +187,7 @@ impl Contract {
 
             return Web4Response::html_response(
                 include_str!("../res/app.html")
+                    .replace("%CONTRACT_NAME%", &env::current_account_id().to_string())
                     .replace("%APP_PAGE_TITLE%", &app.title)
                     .replace("%APP_PAGE_IMAGE%", &image_url)
                     .replace("%APP_PAGE_DAPP_CONTRACT%", &app.dapp_account_id.to_string())
@@ -192,6 +207,8 @@ impl Contract {
         // MAIN PAGE
         let mut active_category_id: Option<CategoryId> = None;
         let mut app_html: String = "".to_string();
+        let mut category_link: String = "".to_string();
+        let mut category_subtitle: String = "".to_string();
         // APPS for a specific category
         if path.starts_with("/category/") {
             let slug = &path[10..]; // 10 = "/category/".len()
@@ -206,6 +223,8 @@ impl Contract {
                         }
                     }
                     active_category_id = Some(category_id);
+                    category_link = format!("category/{}", slug);
+                    category_subtitle = format!(" - {}", category.title);
                     break;
                 }
             }
@@ -220,8 +239,11 @@ impl Contract {
 
         Web4Response::html_response(
             include_str!("../res/catalog.html")
+                .replace("%CONTRACT_NAME%", &env::current_account_id().to_string())
                 .replace("%APPLICATIONS%", &app_html)
                 .replace("%CATEGORIES%", &self.format_categories_menu(active_category_id))
+                .replace("%CATALOG_SUBTITLE%", &category_subtitle)
+                .replace("%CATEGORY_LINK%", &category_link)
                 .replace("%FOOTER%", &include_str!("../res/footer.inc").to_string())
                 .replace("%ICONS%", &include_str!("../res/icons.inc").to_string())
         )

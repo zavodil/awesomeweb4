@@ -1,0 +1,17 @@
+{
+  "name": "AwesomeWeb4",
+  "short_name": "AwesomeWeb4",
+  "description": "Apps built on NEAR Blockchain using Web4 protocol.",
+  "icons": [
+    {
+      "src": "logo.svg",
+      "purpose": "maskable any",
+      "sizes": "any"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "orientation" : "any",
+  "background_color": "#FFFFFF",
+  "theme_color": "#8b14cf"
+}
