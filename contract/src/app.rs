@@ -95,29 +95,29 @@ impl From<VApp> for AppJSON {
     }
 }
 
-
 impl Contract {
     pub(crate) fn internal_insert_app(&mut self, app_id: AppId, app: AppJSON, added_by_account_id: Option<AccountId>,
                                       categories: UnorderedSet<CategoryId>, contracts: UnorderedSet<AccountId>) {
-        self.app_id_by_slug.insert(&app.slug, &app_id);
+        let slug = filter_slug(app.slug).to_lowercase();
+        self.app_id_by_slug.insert(&slug, &app_id);
         self.app_id_by_dapp_account_id.insert(&app.dapp_account_id, &app_id);
 
         let app = App {
             added_by_account_id: added_by_account_id.expect("ERR_MISSING_ADDED_BY_ACCOUNT_ID"),
             dapp_account_id: app.dapp_account_id,
-            slug: app.slug.to_lowercase(),
-            title: app.title,
+            slug,
+            title: filter_text(Some(app.title)).unwrap_or_default(),
             categories,
-            oneliner: app.oneliner,
-            description: app.description,
-            logo_url: app.logo_url,
-            twitter: app.twitter,
-            facebook: app.facebook,
-            medium: app.medium,
-            telegram: app.telegram,
-            github: app.github,
-            discord: app.discord,
-            symbol: app.symbol,
+            oneliner: filter_text(app.oneliner),
+            description: filter_html(app.description),
+            logo_url: filter_text(app.logo_url),
+            twitter: filter_text(app.twitter),
+            facebook: filter_text(app.facebook),
+            medium: filter_text(app.medium),
+            telegram: filter_text(app.telegram),
+            github: filter_text(app.github),
+            discord: filter_text(app.discord),
+            symbol: filter_text(app.symbol),
             contracts,
             token_address: app.token_address,
             active: app.active,

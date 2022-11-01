@@ -3811,6 +3811,10 @@ html {
     padding-bottom: .5rem
 }
 
+.near-content .markdown p {
+    margin-bottom: .5em;
+}
+
 @media screen and (max-width: 600px) {
     .near-content .content-widget {
         padding: 1.5rem 1rem

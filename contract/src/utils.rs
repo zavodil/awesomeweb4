@@ -160,3 +160,53 @@ pub(crate) fn unordered_map_pagination<K, VV, V>(
         .collect()
 }
 
+pub (crate) fn filter_slug(s: String) -> String {
+    s.chars()
+        .into_iter()
+        .filter_map(|c| match c {
+            | '_' |  '-' => Some(c),
+            _ if c.is_alphanumeric() => Some(c),
+            _ => None,
+        })
+        .collect()
+}
+
+pub (crate) fn filter_text(s: Option<String>) -> Option<String> {
+    if let Some(s) = s {
+        Some (
+            s.chars()
+            .into_iter()
+            .filter_map(|c| match c {
+                '\n' => Some(' '),
+                ' ' | '_' | '.' | '-' | ',' | '!' | '(' | ')' | '/' | '=' | ':' | '+' | '?' | '#' | '%' | '|' => Some(c),
+                _ if c.is_alphanumeric() => Some(c),
+                _ => None,
+            })
+            .collect()
+        )
+    }
+    else {
+        None
+    }
+}
+
+pub (crate) fn filter_html(s: Option<String>) -> Option<String> {
+    if let Some(s) = s {
+        Some (
+    s.chars()
+        .into_iter()
+        .filter_map(|c| match c {
+            '<' => Some("&lt;".to_string()),
+            '>' => Some("&gt;".to_string()),
+            '\n' => Some(('\n' as char).to_string()),
+            ' ' | '_' | '.' | '-' | ',' | '!' | '(' | ')' | '/' | '=' | ':' | '+' | '?' | '#' | '%' | '|' | '\\' => Some((c as char).to_string()).clone(),
+            _ if c.is_alphanumeric() => Some((c as char).to_string()).clone(),
+            _ => None,
+        })
+        .collect()
+        )
+    }
+    else {
+        None
+    }
+}
